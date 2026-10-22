@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-label="机器鳄鱼">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#35616c"/>
+      <stop offset="1" stop-color="#173440"/>
+    </linearGradient>
+    <linearGradient id="metal" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#8aa27a"/>
+      <stop offset="1" stop-color="#4b6150"/>
+    </linearGradient>
+    <linearGradient id="steel" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#b7c4c2"/>
+      <stop offset="1" stop-color="#62767b"/>
+    </linearGradient>
+  </defs>
+  <rect width="128" height="128" rx="28" fill="url(#bg)"/>
+  <path d="M9 19h110M9 109h110" stroke="#8fd6d0" stroke-opacity=".12" stroke-width="2"/>
+  <path d="M92 42c12 0 20 8 20 20v20c0 8-5 14-13 15l-25 5-9-11 7-13 9-3V52l11-10Z" fill="#3d5547" stroke="#182a25" stroke-width="3"/>
+  <path d="M18 61c9-9 20-13 36-13h24c7 0 11 4 11 11v8c0 9-7 15-17 17l-33 5c-10 2-18-2-21-9l-5-11 5-8Z" fill="url(#metal)" stroke="#162620" stroke-width="3.5"/>
+  <path d="M22 62h43l17 5-2 9-25 5-24 4-9-8v-15Z" fill="#617a61" stroke="#1d3128" stroke-width="2.5"/>
+  <path d="M29 78c15 2 31 1 51-3l10-2-5 14-34 5c-10 1-17-1-22-5v-9Z" fill="#2c4043" stroke="#142326" stroke-width="3"/>
+  <path d="M29 79c15 3 34 1 56-4" fill="none" stroke="#d64a36" stroke-width="4" stroke-linecap="round"/>
+  <path d="M37 73v7M45 73v6M53 73v6M61 73v5M69 73v5" stroke="#f0e7c9" stroke-width="3.5" stroke-linecap="round"/>
+  <path d="M36 88v-6M44 89v-6M52 89v-6M60 88v-6M68 87v-6" stroke="#f0e7c9" stroke-width="3" stroke-linecap="round"/>
+  <path d="M82 48l12-7 10 4 4 9-8 8-13-2-5-12Z" fill="url(#steel)" stroke="#233539" stroke-width="2.5"/>
+  <circle cx="97" cy="54" r="6.5" fill="#270504" stroke="#0f1b1e" stroke-width="2"/>
+  <circle cx="97" cy="54" r="3.4" fill="#ff3b24"/>
+  <circle cx="98.2" cy="52.8" r="1.2" fill="#ffd6c9"/>
+  <path d="M78 41l8-14 18 7-3 15-23-8Z" fill="#41574b" stroke="#1a2b25" stroke-width="2.5"/>
+  <path d="M24 55l8-10 6 8-5 9-9-7Z" fill="#9b4e39" stroke="#3f1a15" stroke-width="2"/>
+  <path d="M18 58l6-8 4 4-3 7-7-3Z" fill="#d66f4e"/>
+  <path d="M105 71l9 2 4 9-12 1-1-12Z" fill="#d6a93c" stroke="#4a3a15" stroke-width="2"/>
+  <path d="M111 72l-4 8M113 75l-4 7" stroke="#27312c" stroke-width="2"/>
+  <circle cx="29" cy="47" r="2.4" fill="#aebbb9"/>
+  <circle cx="78" cy="42" r="2.4" fill="#aebbb9"/>
+  <path d="M42 61h17M42 65h13" stroke="#8ba58f" stroke-width="1.6" stroke-opacity=".7"/>
+  <path d="M102 35l4-11 4 10-4 12-4-11Z" fill="#d6a93c" stroke="#4a3a15" stroke-width="2"/>
+  <circle cx="106" cy="25" r="4" fill="#ff4430"/>
+  <path d="M75 99l14-3 7 8-14 5-7-10Z" fill="#26383c" stroke="#122124" stroke-width="2"/>
+</svg>

@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<title>MODEL TEST</title>
+<style>
+  html, body { margin: 0; height: 100%; overflow: hidden; background: #0e1320; }
+  #info { position: fixed; left: 8px; top: 8px; color: #9fe8ff; font: 11px monospace; white-space: pre-wrap; z-index: 10; max-width: 48vw; }
+</style>
+</head>
+<body>
+<div id="info">loading...</div>
+<script type="module">
+import * as THREE from 'three';
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
+
+const params = new URLSearchParams(location.search);
+const modelName = params.get('m') || 'seia';
+const clipName = params.get('clip') || 'Normal_Idle';
+const yaw = Number(params.get('yaw') || 0);
+const time = Number(params.get('t') || 0);
+const view = params.get('view') || 'front';
+const hideOutline = params.get('outline') === '0';
+const haloMode = params.get('halo') || 'normal';
+const info = document.getElementById('info');
+
+const renderer = new THREE.WebGLRenderer({ antialias: true });
+renderer.setSize(innerWidth, innerHeight);
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+document.body.appendChild(renderer.domElement);
+
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x1a2438);
+scene.add(new THREE.HemisphereLight(0xffffff, 0x445577, 2.2));
+const dir = new THREE.DirectionalLight(0xffffff, 2.2);
+dir.position.set(2, 5, 4);
+scene.add(dir);
+
+const camera = new THREE.PerspectiveCamera(40, innerWidth / innerHeight, 0.01, 100);
+if (view === 'front') camera.position.set(0, 1.35, 3.4);
+else if (view === 'back') camera.position.set(0, 1.35, -3.4);
+else camera.position.set(3.2, 1.5, 0);
+camera.lookAt(0, 0.9, 0);
+
+scene.add(new THREE.GridHelper(6, 12, 0x557799, 0x2a3a55));
+
+const pivot = new THREE.Group();
+scene.add(pivot);
+
+const meshLog = [];
+globalThis.__STATE = { ready: false, error: null };
+new GLTFLoader().load('/models/' + modelName + '.glb', (gltf) => {
+  const model = gltf.scene;
+  pivot.add(model);
+  const haloMaterials = [];
+  model.traverse(o => {
+    if (!o.isMesh) return;
+    o.frustumCulled = false;
+    const mats = Array.isArray(o.material) ? o.material : [o.material];
+    meshLog.push(o.name + ' [' + mats.map(m => m && m.name).join(',') + ']');
+    if (/^Mouth_/i.test(o.name)) o.visible = false;
+    if (hideOutline && /outline/i.test(o.name)) o.visible = false;
+  });
+  if (haloMode === 'basic') {
+    model.traverse(o => {
+      if (!o.isMesh) return;
+      const mats = Array.isArray(o.material) ? o.material : [o.material];
+      if (!mats.some(m => m && /Halo/i.test(m.name))) return;
+      o.material = new THREE.MeshBasicMaterial({ map: mats[0].map, color: 0xfff2c0, transparent: true, opacity: 0.95, depthWrite: false, side: THREE.DoubleSide, toneMapped: false });
+    });
+  }
+
+  const box = new THREE.Box3();
+  pivot.updateMatrixWorld(true);
+  model.traverse(o => {
+    if (!o.isMesh || !o.visible) return;
+    const mats = Array.isArray(o.material) ? o.material : [o.material];
+    if (mats.every(m => m && /Mouth_\d/i.test(m.name))) return;
+    if (o.isSkinnedMesh) o.computeBoundingBox();
+    else if (!o.geometry.boundingBox) o.geometry.computeBoundingBox();
+    const bb = (o.boundingBox || o.geometry.boundingBox)?.clone();
+    if (bb && !bb.isEmpty()) box.union(bb.applyMatrix4(o.matrixWorld));
+  });
+  const size = box.getSize(new THREE.Vector3());
+  const s = 1.55 / Math.max(0.0001, size.y);
+  model.scale.setScalar(s);
+
+  const mixer = new THREE.AnimationMixer(model);
+  const chosen = gltf.animations.find(c => c.name === clipName) || gltf.animations[0];
+  const clips = gltf.animations.map(c => c.name);
+  if (chosen) {
+    mixer.clipAction(chosen).play();
+    mixer.setTime(Math.min(time, chosen.duration - 0.01));
+  }
+  pivot.updateMatrixWorld(true);
+
+  const footBones = [];
+  model.traverse(o => { if (/Foot|Toe/i.test(o.name)) footBones.push(o); });
+  let minY = Infinity;
+  const wp = new THREE.Vector3();
+  for (const b of footBones) { b.getWorldPosition(wp); if (wp.y < minY) minY = wp.y; }
+  if (!Number.isFinite(minY)) minY = box.min.y * s;
+  model.position.y -= (minY - 0.02);
+  pivot.rotation.y = THREE.MathUtils.degToRad(yaw);
+  pivot.updateMatrixWorld(true);
+
+  const b2 = new THREE.Box3().setFromObject(model);
+  info.textContent = 'model=' + modelName + ' clips=' + clips.length +
+    '\nactive=' + (chosen && chosen.name) + ' dur=' + (chosen && chosen.duration.toFixed(2)) +
+    '\nraw height=' + size.y.toFixed(2) + ' scale=' + s.toFixed(3) +
+    '\nafter foot align bbox y: ' + b2.min.y.toFixed(2) + '..' + b2.max.y.toFixed(2) +
+    '\nfootBones=' + footBones.length + ' minY=' + minY.toFixed(2) +
+    '\nyaw=' + yaw + ' view=' + view + ' halo=' + haloMode +
+    '\n' + meshLog.slice(0, 26).join('\n');
+  globalThis.__STATE = { ready: true, size: size.toArray(), scale: s, clips, box: { min: b2.min.toArray(), max: b2.max.toArray() } };
+}, undefined, (err) => {
+  globalThis.__STATE = { ready: false, error: String(err && err.message || err) };
+  info.textContent = 'ERROR: ' + (err && err.message || err);
+});
+
+const clock = new THREE.Clock();
+(function tick() {
+  requestAnimationFrame(tick);
+  clock.getDelta();
+  renderer.render(scene, camera);
+})();
+addEventListener('resize', () => {
+  camera.aspect = innerWidth / innerHeight; camera.updateProjectionMatrix();
+  renderer.setSize(innerWidth, innerHeight);
+});
+</script>
+</body>
+</html>

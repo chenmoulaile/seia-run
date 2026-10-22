@@ -1,0 +1,19 @@
+# 依赖
+node_modules/
+.pnpm-store/
+
+# 构建产物
+dist/
+release/
+*.log
+
+# 本地调试 / 临时文件
+.tmp/
+.workbuddy-ai/
+*.local
+.DS_Store
+Thumbs.db
+
+# 编辑器
+.vscode/
+.idea/

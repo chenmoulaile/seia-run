@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<meta name="theme-color" content="#dcebff" />
+<title>圣娅快跑 · SEIA RUN</title>
+<link rel="icon" href="data:," />
+<link rel="stylesheet" href="/src/style.css" />
+</head>
+<body>
+<div id="app">
+  <canvas id="scene"></canvas>
+  <div class="vignette"></div>
+
+  <div id="hud" class="hidden">
+    <div class="hud-bar">
+      <div class="pill pill-gem"><img class="ico-gem" src="/assets/pyroxene.png" alt="" draggable="false" /><b id="hud-gems">0</b></div>
+      <div class="hud-center">
+        <div id="threat" class="threat hidden"><span class="dot"></span><span id="threat-text">机器鳄鱼正在逼近…</span></div>
+      </div>
+      <div class="hud-right">
+        <div class="hud-metrics">
+          <div class="pill pill-dist"><b id="hud-dist">0</b><span class="unit">m</span></div>
+          <div class="pill-score">总分 <b id="hud-score">0</b></div>
+        </div>
+        <button id="btn-pause" class="icon-btn" title="暂停 (Esc)" aria-label="暂停">Ⅱ</button>
+      </div>
+    </div>
+    <div id="toast" class="toast"></div>
+  </div>
+
+  <div id="screen-start" class="screen start-screen">
+    <div class="panel start-panel">
+      <div class="badge">BLUE ARCHIVE · FAN GAME</div>
+      <h1 class="title">圣娅快跑</h1>
+      <div class="title-en">SEIA RUN</div>
+      <p class="tagline" id="tagline">博览会限定追逐赛，现在开跑。</p>
+
+      <div class="story">
+        <div class="croc-chip" id="croc-chip">
+          <img id="pursuer-img" src="/assets/robot_croc_icon.svg" alt="追击者" />
+          <div class="croc-chip-text"><b id="pursuer-name">机器鳄鱼</b><span id="pursuer-sub">千年博览会 · 安保终端</span></div>
+          <span class="chip-danger" id="pursuer-state">追击中</span>
+        </div>
+        <p id="story-quote">“目标锁定：博览会逃逸者。青辉石回收程序启动。”</p>
+        <p class="story-sub" id="story-sub">博览会开幕当天，展台的机械鳄鱼突然暴走，见人就追。你抱着刚领到的青辉石纪念品冲上大街——别回头，别停下，跑！</p>
+      </div>
+
+      <div class="roster">
+        <div class="roster-head">
+          <span>选择逃跑者</span>
+          <span class="roster-hint">点击切换角色</span>
+        </div>
+        <div class="char-row" id="char-row"></div>
+      </div>
+
+      <button id="btn-start" class="btn-primary" disabled>正在加载模型 0%</button>
+
+      <div class="meta-row">
+        <span>最高纪录 <b id="best-start">—</b></span>
+        <span class="meta-keys">← → 换道 · ↑ 跳跃 · ↓ 滑铲 · Esc 暂停</span>
+      </div>
+      <div class="credit">同人作品，非商业用途 · 角色与模型版权归 NEXON / Yostar · 模型与官方语音来自 CodexPet / Kivo 资料 · 机械鳄鱼为程序化原创模型</div>
+    </div>
+    <div class="stage-hint" id="stage-hint">点击学生或机器鳄鱼互动 · 它正在待机…</div>
+  </div>
+
+  <div id="speech" class="speech" aria-live="polite" aria-hidden="true">
+    <span class="speech-name" id="speech-name">圣娅</span>
+    <p id="speech-text"></p>
+  </div>
+
+  <div id="countdown" class="countdown hidden"><span id="countdown-text">3</span></div>
+
+  <div id="swipe-hint" class="swipe-hint hidden">
+    <div class="swipe-item"><b>←→</b><span>左右滑动换道</span></div>
+    <div class="swipe-item"><b>↑</b><span>上滑跳跃</span></div>
+    <div class="swipe-item"><b>↓</b><span>下滑滑铲</span></div>
+  </div>
+
+  <div id="screen-pause" class="screen hidden">
+    <div class="panel modal-panel">
+      <h2>暂停</h2>
+      <p class="modal-sub">追兵暂时停下了。趁现在。</p>
+      <button id="btn-resume" class="btn-primary">继续逃跑</button>
+      <button id="btn-restart" class="btn-ghost">重新开始</button>
+      <button id="btn-home" class="btn-ghost">回到主菜单</button>
+      <button id="btn-sound" class="btn-ghost">音效：开</button>
+    </div>
+  </div>
+
+  <div id="screen-over" class="screen hidden">
+    <div class="panel modal-panel over-panel">
+      <img class="over-avatar" id="over-avatar" src="/assets/robot_croc_icon.svg" alt="追击者" />
+      <div class="over-tag" id="over-tag">被 咬 住 了</div>
+      <h2 id="over-title">博览会，下次再来吧。</h2>
+      <p class="quote" id="over-quote">“青辉石回收完成。请返回展台领取纪念品。”</p>
+      <div class="stats">
+        <div class="stat"><span>青辉石</span><b id="stat-gems">0</b></div>
+        <div class="stat"><span>逃逸距离</span><b id="stat-dist">0m</b></div>
+        <div class="stat"><span>总评分</span><b id="stat-score">0</b></div>
+      </div>
+      <div id="new-record" class="new-record hidden">NEW RECORD · 机器鳄鱼记住你了</div>
+      <div class="best-row">最高纪录 <b id="best-over">—</b></div>
+      <button id="btn-again" class="btn-primary">再来一次</button>
+      <button id="btn-back" class="btn-ghost">返回主菜单</button>
+    </div>
+  </div>
+</div>
+<script type="module" src="/src/main.js"></script>
+</body>
+</html>
